@@ -29,42 +29,16 @@ This project gives you the power of modern AI assistance while keeping you in co
 # dev_assist: planned project structure
 
 dev-assistant/  
-├── docker/  
-│   ├── api/  
-│   │   └── Dockerfile        # Go API Dockerfile  
-│   ├── llm/  
-│   │   └── Dockerfile        # Python LLM service Dockerfile  
-│   ├── web-react/  
-│   │   └── Dockerfile        # React frontend Dockerfile  
-│   └── docker-compose.yml  
-│  
-├── api/                      # Go API service  
-│   ├── cmd/  
-│   │   └── main.go          # Entry point  
-│   ├── internal/  
-│   │   ├── auth/            # Authentication logic  
-│   │   ├── handlers/        # HTTP handlers  
-│   │   ├── models/          # Data models  
-│   │   └── service/         # Business logic  
-│   └── web/                 # Go-served web interface  
-│       ├── static/          # Static assets  
-│       │   ├── css/  
-│       │   └── js/  
-│       └── templates/       # Go HTML templates  
-│  
-├── web-react/               # React frontend  
-│   ├── src/  
-│   │   ├── components/  
-│   │   ├── pages/  
-│   │   └── App.tsx  
-│   └── package.json  
-│  
-├── llm/                     # Python LLM service  
-│   ├── app/  
-│   │   ├── __init__.py  
-│   │   ├── inference.py     # LLM inference logic  
-│   │   └── security.py      # Security utilities  
-│   └── requirements.txt  
-│  
-├── README.md  
-└── .gitignore  
+├── docker-compose.yml      # Main compose file at root  
+├── api/                    # Go API service  
+│   ├── Dockerfile  
+│   └── ...
+├── llm/                    # Python LLM service  
+│   ├── Dockerfile  
+│   ├── requirements.txt  
+│   └── app/  
+│       └── ...  
+├── web-react/              # React frontend (if we add it later)  
+│   ├── Dockerfile  
+│   └── ...  
+└── README.md  
