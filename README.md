@@ -1,7 +1,8 @@
 # Dev Assist: Project Overview
 A personal development assistant built with the following features:
 - Maintains complete privacy by running locally
-- Can understand your entire codebase's context
+- Can understand your entire codebase's context locally
+- Optional integration with commercial LLMs for general development questions
 - Provides fully customizable responses and behavior
 - Integrates with your local development environment
 - Costs nothing to run (after initial setup)
@@ -21,7 +22,11 @@ This project gives you the power of modern AI assistance while keeping you in co
 ## Key Features (Planned)
 
 - Local LLM integration (Deepseek)
-- Full codebase understanding
+    - Full codebase understanding
+    - Local code analysis and processing
+- Hybrid LLM approach:
+  - Local models for code analysis and sensitive data
+  - Optional commercial LLM integration (OpenAI, etc.) for general queries
 - Customizable responses and behavior
 - Choice of interfaces (Web UI or API)
 - Built with Go and Python for performance and flexibility

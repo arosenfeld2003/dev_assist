@@ -21,6 +21,8 @@ COPY app/ ./app/
 
 # Set environment variables
 ENV MODEL_ID="deepseek-ai/deepseek-coder-1.3b-base"
+# OpenAI API key will be loaded from .env file
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 
 # Expose the port
 EXPOSE 8000

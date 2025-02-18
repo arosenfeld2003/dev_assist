@@ -1,17 +1,20 @@
-# app/main.py
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import os
+from dotenv import load_dotenv
 import platform
+
+# Load environment variables
+load_dotenv()
 
 # Initialize FastAPI application
 app = FastAPI()
 
 # Get model ID from environment variable, with a fallback default
 model_id = os.getenv("MODEL_ID", "deepseek-ai/deepseek-coder-1.3b-base") # smaller model
-
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY")) # optional commercial LLM integration
 
 def get_device():
     """
@@ -34,7 +37,7 @@ class CodeQuery(BaseModel):
     prompt: str  # The input prompt for code generation
     max_length: int = 1024  # Maximum length of generated response
     randomness: float = 0.7  # Controls randomness in generation (0.0 = deterministic, 1.0 = very random)
-
+    use_openai: bool = False
 
 @app.on_event("startup")
 async def startup_event():
@@ -79,7 +82,8 @@ async def health_check():
         "device": device,
         "platform": platform.platform(),
         "python_version": platform.python_version(),
-        "torch_version": torch.__version__
+        "torch_version": torch.__version__,
+        "openai_available": bool(os.getenv("OPENAI_API_KEY"))
     }
 
 
@@ -98,18 +102,33 @@ async def generate_code(query: CodeQuery):
         HTTPException: If any error occurs during generation
     """
     try:
-        device = get_device()
+        if query.use_openai and os.getenv("OPENAI_API_KEY"):
+            # Use OpenAI
+            response = openai_client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    # TODO: Add system prompt
+                    {"role": "system", "content": "You are a helpful coding assistant."},
+                    {"role": "user", "content": query.prompt}
+                ],
+                temperature=query.randomness,
+                max_tokens=query.max_length
+            )
+            return {"response": response.choices[0].message.content}
+        else:
+            # Use local model
+            device = get_device()
 
-        # Convert input text to token IDs and move to appropriate device
-        inputs = tokenizer(query.prompt, return_tensors="pt").to(device)
+            # Convert input text to token IDs and move to appropriate device
+            inputs = tokenizer(query.prompt, return_tensors="pt").to(device)
 
-        # Generate response using the model
-        outputs = model.generate(
-            **inputs,
-            max_length=query.max_length,
-            temperature=query.randomness,
-            pad_token_id=tokenizer.eos_token_id  # Properly handle end of sequence
-        )
+            # Generate response using local llm
+            outputs = model.generate(
+                **inputs,
+                max_length=query.max_length,
+                temperature=query.randomness,
+                pad_token_id=tokenizer.eos_token_id  # Properly handle end of sequence
+            )
 
         # Convert token IDs back to text
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
